@@ -1,92 +1,69 @@
 package com.oleksiy.todo.controller;
 
+import com.oleksiy.todo.dto.UserResponse;
+import com.oleksiy.todo.model.Role;
 import com.oleksiy.todo.model.User;
 import com.oleksiy.todo.service.RoleService;
 import com.oleksiy.todo.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/users")
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/users")
 @AllArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder bCryptPasswordEncoder;
 
-    @GetMapping("/create")
-    @PreAuthorize("hasRole('ADMIN') or isAnonymous()")
-    public String create(Model model) {
-        model.addAttribute("user", new User());
-        return "create-user";
+    @PostMapping
+    //@PreAuthorize("hasRole('ADMIN') or isAnonymous()")
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid User user) {
+        user.setRole(roleService.readById(2L));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        return new ResponseEntity<>(new UserResponse(userService.create(user)), HttpStatus.CREATED);
     }
 
-    @PostMapping("/create")
-    @PreAuthorize("hasRole('ADMIN') or isAnonymous()")
-    public String create(@Validated @ModelAttribute("user") User user, BindingResult result) {
-        if (result.hasErrors()) {
-            return "create-user";
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(roleService.readById(2));
-        User newUser = userService.create(user);
-        return "redirect:/todos/all/users/" + newUser.getId();
+    @GetMapping("/{user_id}")
+    //@PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
+    public ResponseEntity<UserResponse> readUser(@PathVariable("user_id") long id) {
+        return new ResponseEntity<>(new UserResponse(userService.readById(id)), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/read")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
-    public String read(@PathVariable long id, Model model) {
-        User user = userService.readById(id);
-        model.addAttribute("user", user);
-        return "user-info";
+    @PutMapping("/{user_id}")
+    //@PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable("user_id") long id, @RequestBody @Valid User user) {
+        user.setId(id);
+        user.setEmail(userService.readById(id).getEmail()); // save old email
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword())); // may be error null
+        return new ResponseEntity<>(new UserResponse(userService.update(user)), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/update")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
-    public String update(@PathVariable long id, Model model) {
-        User user = userService.readById(id);
-        model.addAttribute("user", user);
-        model.addAttribute("roles", roleService.getAll());
-        return "update-user";
-    }
-
-    @PostMapping("/{id}/update")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
-    public String update(@PathVariable long id, Model model, @Validated @ModelAttribute("user") User user,
-                         @RequestParam("roleId") long roleId, BindingResult result) {
-        User oldUser = userService.readById(id);
-        if (result.hasErrors()) {
-            user.setRole(oldUser.getRole());
-            model.addAttribute("roles", roleService.getAll());
-            return "update-user";
-        }
-        if (oldUser.getRole().getName().equals("USER")) {
-            user.setRole(oldUser.getRole());
-        } else {
-            user.setRole(roleService.readById(roleId));
-        }
-        userService.update(user);
-        return "redirect:/users/" + id + "/read";
-    }
-
-    @GetMapping("/{id}/delete")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String delete(@PathVariable("id") long id) {
+    @DeleteMapping( "/{user_id}")
+    //@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> deleteUser(@PathVariable("user_id") long id) {
         userService.delete(id);
-        return "redirect:/users/all";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String getAll(Model model) {
-        model.addAttribute("users", userService.getAll());
-        return "users-list";
+    @GetMapping
+    //@PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> getAll() {
+        return userService.getAll().stream()
+                .map(UserResponse::new)
+                .collect(Collectors.toList());
     }
+
 }

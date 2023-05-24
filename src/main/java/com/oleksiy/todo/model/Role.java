@@ -3,6 +3,7 @@ package com.oleksiy.todo.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @Table(name = "roles")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

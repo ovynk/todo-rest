@@ -30,7 +30,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authz) -> authz
                         .anyRequest().permitAll()
                 )
-                .httpBasic(withDefaults());
+                .httpBasic(withDefaults())
+                .csrf().disable();
         return http.build();
     }
 
