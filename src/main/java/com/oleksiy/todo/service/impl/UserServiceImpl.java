@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
@@ -56,6 +56,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public List<User> getAll() {
         List<User> users = userRepository.findAll();
         return users.isEmpty() ? new ArrayList<>() : users;
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
