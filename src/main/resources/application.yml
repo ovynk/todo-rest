@@ -18,3 +18,8 @@ spring:
     console:
       enabled: true
       path: /h2
+
+jwt:
+  token:
+    secret: SEC-U90LMRD20-EDJDDASDKFB39NDQ29801MS
+    expired: 3600000
