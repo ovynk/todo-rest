@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.List;
-
 @Entity
 @Table(name = "roles")
 @Getter
@@ -22,9 +20,6 @@ public class Role implements GrantedAuthority {
     @NotBlank(message = "The 'name' cannot be empty")
     @Column(name = "name", nullable = false, unique = true)
     private String name;
-
-    @OneToMany(mappedBy = "role")
-    private List<User> users;
 
     @Override
     public String getAuthority() {
