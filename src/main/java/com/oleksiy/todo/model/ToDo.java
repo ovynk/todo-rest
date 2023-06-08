@@ -43,10 +43,11 @@ public class ToDo {
 
     @Override
     public String toString() {
-        return "ToDo {" +
-                "id = " + id +
-                ", title = '" + title + '\'' +
-                ", createdAt = " + createdAt +
-                "} ";
+        return "ToDo{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", createdAt=" + createdAt +
+                ", owner=" + owner +
+                '}';
     }
 }
