@@ -30,7 +30,7 @@ public class ToDoController {
     private final ChatRoomService chatRoomService;
 
     @PostMapping
-    // @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #ownerId == authentication.principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #ownerId == authentication.principal.id)")
     public ResponseEntity<ToDoResponse> createToDo(@RequestBody @Valid ToDo todo,
                                                    @RequestParam("user_id") long ownerId) {
         todo.setCreatedAt(LocalDateTime.now());
@@ -52,8 +52,8 @@ public class ToDoController {
     }
 
     @PutMapping("/{todo_id}")
-//    @PreAuthorize("hasRole('ADMIN') or " +
-//            "(hasRole('USER') and @toDoServiceImpl.userIsOwner(#todoId, authentication.principal.id))")
+    @PreAuthorize("hasRole('ADMIN') or " +
+            "(hasRole('USER') and @toDoServiceImpl.userIsOwner(#todoId, authentication.principal.id))")
     public ResponseEntity<ToDoResponse> updateToDo(@RequestBody @Valid ToDo toDo,
                                                    @PathVariable("todo_id") long todoId) {
         ToDo oldTodo = todoService.readById(todoId);
@@ -62,25 +62,25 @@ public class ToDoController {
     }
 
     @DeleteMapping("/{todo_id}")
-//    @PreAuthorize("hasRole('ADMIN') or " +
-//            "(hasRole('USER') and @toDoServiceImpl.userIsOwner(#todoId, authentication.principal.id))")
+    @PreAuthorize("hasRole('ADMIN') or " +
+            "(hasRole('USER') and @toDoServiceImpl.userIsOwner(#todoId, authentication.principal.id))")
     public ResponseEntity<?> deleteToDo(@PathVariable("todo_id") long todoId) {
         todoService.delete(todoId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping
-//    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == authentication.principal.id)")
-    public ResponseEntity<List<ToDoResponse>> getAllByUser(@RequestParam(name = "owner_id") long owner_id) {
-        return new ResponseEntity<>(todoService.getByUserId(owner_id)
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == authentication.principal.id)")
+    public ResponseEntity<List<ToDoResponse>> getAllByUser(@RequestParam(name = "user_id") long userId) {
+        return new ResponseEntity<>(todoService.getByUserId(userId)
                 .stream()
                 .map(ToDoResponse::new)
                 .collect(Collectors.toList()), HttpStatus.OK);
     }
 
-    @PutMapping("/{todo_id}/add")
-//    @PreAuthorize("hasRole('ADMIN') or " +
-//            "(hasRole('USER') and @toDoServiceImpl.userIsOwner(#id, authentication.principal.id))")
+    @GetMapping("/{todo_id}/add")
+    @PreAuthorize("hasRole('ADMIN') or " +
+            "(hasRole('USER') and @toDoServiceImpl.userIsOwner(#id, authentication.principal.id))")
     public ResponseEntity<ToDoResponse> addCollaborator(@PathVariable("todo_id") long id,
                                                         @RequestParam("user_id") long userId) {
         ToDo todo = todoService.readById(id);
@@ -93,8 +93,8 @@ public class ToDoController {
     }
 
     @GetMapping("/{todo_id}/remove")
-//    @PreAuthorize("hasRole('ADMIN') or " +
-//            "(hasRole('USER') and @toDoServiceImpl.userIsOwner(#id, authentication.principal.id))")
+    @PreAuthorize("hasRole('ADMIN') or " +
+            "(hasRole('USER') and @toDoServiceImpl.userIsOwner(#id, authentication.principal.id))")
     public ResponseEntity<ToDoResponse> removeCollaborator(@PathVariable("todo_id") long id,
                                                            @RequestParam("user_id") long userId) {
         ToDo todo = todoService.readById(id);
