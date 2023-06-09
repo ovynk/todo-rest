@@ -1,7 +1,6 @@
 package com.oleksiy.todo.controller;
 
 import com.oleksiy.todo.dto.UserResponse;
-import com.oleksiy.todo.model.Role;
 import com.oleksiy.todo.model.User;
 import com.oleksiy.todo.service.RoleService;
 import com.oleksiy.todo.service.UserService;
@@ -11,9 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +25,7 @@ public class UserController {
     private final PasswordEncoder bCryptPasswordEncoder;
 
     @PostMapping
-    //@PreAuthorize("hasRole('ADMIN') or isAnonymous()")
+    @PreAuthorize("hasRole('ADMIN') or isAnonymous()")
     public ResponseEntity<UserResponse> createUser(@RequestBody @Valid User user) {
         user.setRole(roleService.readById(2L));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
@@ -37,14 +33,15 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}")
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
     public ResponseEntity<UserResponse> readUser(@PathVariable("user_id") long id) {
         return new ResponseEntity<>(new UserResponse(userService.readById(id)), HttpStatus.OK);
     }
 
     @PutMapping("/{user_id}")
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable("user_id") long id, @RequestBody @Valid User user) {
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable("user_id") long id,
+                                                   @RequestBody @Valid User user) {
         user.setId(id);
         user.setEmail(userService.readById(id).getEmail()); // save old email
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword())); // may be error null
@@ -52,14 +49,14 @@ public class UserController {
     }
 
     @DeleteMapping( "/{user_id}")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #id == authentication.principal.id)")
     public ResponseEntity<User> deleteUser(@PathVariable("user_id") long id) {
         userService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getAll() {
         return userService.getAll().stream()
                 .map(UserResponse::new)
