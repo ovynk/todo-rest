@@ -3,7 +3,7 @@ package com.oleksiy.todo.dto;
 import lombok.Data;
 
 @Data
-public class AuthRequestDto {
+public class AuthRequest {
 
     private String username;
     private String password;
