@@ -2,6 +2,8 @@ package com.oleksiy.todo.service.impl;
 
 import com.oleksiy.todo.exception.NullEntityReferenceException;
 import com.oleksiy.todo.model.Task;
+import com.oleksiy.todo.model.ToDo;
+import com.oleksiy.todo.model.User;
 import com.oleksiy.todo.repository.TaskRepository;
 import com.oleksiy.todo.service.TaskService;
 import jakarta.persistence.EntityNotFoundException;
@@ -64,5 +66,14 @@ public class TaskServiceImpl implements TaskService {
 
     public boolean taskFromThisTodo(long taskId, long todoId) {
         return readById(taskId).getTodo().getId() == todoId;
+    }
+
+    public boolean userIsOwnerOrCollaborator(long taskId, long userId) {
+        ToDo toDo = readById(taskId).getTodo();
+
+        List<User> users = toDo.getCollaborators();
+        users.add(toDo.getOwner());
+
+        return users.stream().anyMatch(user -> user.getId() == userId);
     }
 }
