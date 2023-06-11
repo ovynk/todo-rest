@@ -4,7 +4,6 @@ import com.oleksiy.todo.dto.ToDoResponse;
 import com.oleksiy.todo.model.ToDo;
 import com.oleksiy.todo.model.User;
 import com.oleksiy.todo.model.chat.ChatRoom;
-import com.oleksiy.todo.repository.RoleRepository;
 import com.oleksiy.todo.service.ChatRoomService;
 import com.oleksiy.todo.service.ToDoService;
 import com.oleksiy.todo.service.UserService;
@@ -13,7 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -73,6 +71,15 @@ public class ToDoController {
     @PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and #userId == authentication.principal.id)")
     public ResponseEntity<List<ToDoResponse>> getAllByUser(@RequestParam(name = "user_id") long userId) {
         return new ResponseEntity<>(todoService.getByUserId(userId)
+                .stream()
+                .map(ToDoResponse::new)
+                .collect(Collectors.toList()), HttpStatus.OK);
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ToDoResponse>> getAll() {
+        return new ResponseEntity<>(todoService.getAll()
                 .stream()
                 .map(ToDoResponse::new)
                 .collect(Collectors.toList()), HttpStatus.OK);

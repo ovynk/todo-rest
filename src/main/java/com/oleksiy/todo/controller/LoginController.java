@@ -1,11 +1,10 @@
 package com.oleksiy.todo.controller;
 
 import com.oleksiy.todo.config.jwt.JwtTokenProvider;
-import com.oleksiy.todo.dto.AuthRequestDto;
+import com.oleksiy.todo.dto.AuthRequest;
 import com.oleksiy.todo.model.User;
 import com.oleksiy.todo.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,7 +31,7 @@ public class LoginController {
     private final UserService userService;
 
     @PostMapping("login")
-    public ResponseEntity<Map<Object, Object>> login(@RequestBody AuthRequestDto requestDto) {
+    public ResponseEntity<Map<Object, Object>> login(@RequestBody AuthRequest requestDto) {
         try {
             String username = requestDto.getUsername();
             authenticationManager
