@@ -1,42 +1,32 @@
-# Simple project Web ToDo list with implementation of chat
+# Project REST ToDo list
 
-Project is written to practice and learn new skills.
+Project is written based on previous project Web ToDo list
 <br>
-Spring boot 3.0.5. Maven. PostgreSQL.
+Spring boot 3.0.5. Maven. H2 database. JWT.
 
 ## Capabilities
 
 In this project you'll see the following:
 
-* Obtain and persist data in database
-* Controllers
-* Mapping Requests (GET and POST)
-* Models (Role, User, ToDo, Task, ChatMessage and others)
 * Registration, Logging In and Out
+* Obtain and persist data in database
+* RestControllers
+* Models (Role, User, ToDo, Task)
+* Create, update, read, remove models(GET, POST, PUT, DELETE mappings)
 * Roles privileges (Admin and user)
-* Chat in each todo
 * Exception handling
-* Bootstrap for style of pages
 
 ## Configuration details
 
-* PostgreSQL Driver
+* H2 database
 * Spring Data and Hibernate
-* Spring MVC pattern
-* Thymeleaf template engine
-* Exception handling
 * Spring security
-* WebSocket (SockJS and STOMP)
+* Json web token
 
 ## Run
 
-Application use postgreSQL database so you need to create one ***empty*** and<br>
-edit application.properties with url to database, username and password.
-
-![prop-setting](https://user-images.githubusercontent.com/90598021/235520032-ccf66dea-3929-485e-896b-b18e251c5c3f.png)
-
-You do not need create anything in empty database. Project has data.sql file.<br> 
-Application.properties is configured so that ***every time running*** tables generates automtically<br>
+You need to run project than h2 database will be craeted automatically with some start data.
+If you have created database you need to change sql init mode to never in application.yml.
 
 There are users in data.sql
 
@@ -45,7 +35,3 @@ There are users in data.sql
 | mike@mail.com | 1111     | ADMIN |
 | nick@mail.com | 2222     | USER  |
 | nora@mail.com | 3333     | USER  |
-
-## Fast review
-
-https://user-images.githubusercontent.com/90598021/235752046-ef07b6f0-ed31-4ff3-835b-c35e39285392.mp4
